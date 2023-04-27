@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+
+const inquirer = require('inquirer')
+const ora = require('ora')
+const path = require('path')
+const fs = require('fs-extra')
+const tinify = require('tinify')
+const symbols = require('log-symbols')
+const chalk = require('chalk')
+chalk.level = 1
+
+const question = [
+  {
+    name: 'apiKey',
+    type: 'input',
+    message: '请输入apiKey',
+    validate(val) {
+      if (!val) return 'apiKey is required!'
+      return true
+    },
+  },
+  {
+    name: 'dirname',
+    type: 'input',
+    message: '请输入相对当前文件夹路径',
+    validate(val) {
+      if (!val) return 'The dir is required!'
+      return true
+    },
+  },
+  {
+    name: 'limitSize',
+    type: 'input',
+    message: '请输入需要限制的文件大小',
+    validate(val) {
+      return true
+    },
+  },
+]
+const isImage = (file) => /\.(gif|png|jpg|jpeg)$/i.test(file)
+
+async function startWorking(targetDirectory, worker, option) {
+  const { limitSize } = option
+  const spinner = ora('Starting...')
+
+  const work = (dir) => {
+    try {
+      const files = fs.readdirSync(dir)
+      files.forEach((file) => {
+        const dirPath = `${dir}/${file}`
+        const fileStat = fs.statSync(dirPath)
+        console.log(chalk.green('The dirPath is: ' + dirPath + '\n'))
+        console.log(chalk.green('The file name is: ' + file + '\n'))
+        if (fileStat.isDirectory()) {
+          work(dirPath)
+        } else {
+          if (fileStat.size < 1024 * (limitSize || 50) || !isImage(file)) return
+          console.log(chalk.yellow(`The ${file} origin size is ${fileStat.size}\n'`))
+          const source = worker.fromFile(dirPath)
+          source.toFile(dirPath)
+          const newFileStat = fs.statSync(dirPath)
+          console.log(chalk.blue(`The ${file} current size is ${newFileStat.size}\n'`))
+        }
+      })
+    } catch (error) {
+      const errMsg = JSON.stringify(error)
+      console.log(chalk.red(`\n ${errMsg} \n`))
+      spinner.fail()
+    }
+  }
+
+  spinner.start()
+  work(targetDirectory)
+  console.log(chalk.green(symbols.success), chalk.green(' successfully!\n'))
+  spinner.succeed()
+}
+
+async function main() {
+  inquirer.prompt(question).then((answers) => {
+    const { apiKey, dirname, limitSize = 50 } = answers
+    const cwd = process.cwd()
+    const targetPath = path.join(cwd, dirname)
+    const isExit = fs.existsSync(targetPath)
+    if (!isExit) {
+      console.log(chalk.red('\n Target directory does not exit!,Please check! \n '))
+      return
+    }
+
+    console.log(chalk.green('The targetPath is: ' + targetPath + '\n'))
+    console.log(chalk.green('The apiKey is: ' + apiKey + '\n'))
+    console.log(chalk.green('The fime limit size is: ' + limitSize + '\n'))
+    tinify.key = apiKey
+    startWorking(targetPath, tinify, { limitSize })
+  })
+}
+main()

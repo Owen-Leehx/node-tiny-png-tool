@@ -1,0 +1,24 @@
+{
+  "name": "tiny-png-tool",
+  "version": "1.0.0",
+  "description": "tiny png tool",
+  "main": "bin/index",
+  "scripts": {
+    "publish:patch": "npm version patch && npm publish"
+  },
+  "bin": {
+    "tiny": "bin/index",
+    "tiny-start": "commands/start"
+  },
+  "author": "owen lee",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^2.19.0",
+    "fs-extra": "^11.1.0",
+    "inquirer": "^8.0.0",
+    "log-symbols": "^4.0.0",
+    "ora": "^3.2.0",
+    "tinify": "^1.7.1"
+  }
+}
