@@ -1,6 +1,6 @@
 {
   "name": "node-tiny-png-tool",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "tiny png tool",
   "main": "bin/index",
   "scripts": {
