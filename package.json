@@ -1,10 +1,10 @@
 {
-  "name": "tiny-png-tool",
+  "name": "node-tiny-png-tool",
   "version": "1.0.1",
   "description": "tiny png tool",
   "main": "bin/index",
   "scripts": {
-    "publish:patch": "npm version patch && npm publish"
+    "publish:patch": "npm version patch && npm publish --access=public"
   },
   "bin": {
     "tiny": "bin/index",
