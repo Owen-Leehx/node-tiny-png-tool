@@ -37,7 +37,7 @@ const question = [
     },
   },
 ]
-const isImage = (file) => /\.(gif|png|jpg|jpeg)$/i.test(file)
+const isImage = (file) => /\.(png|jpg|jpeg)$/i.test(file)
 
 async function startWorking(targetDirectory, worker, option) {
   const { limitSize } = option
