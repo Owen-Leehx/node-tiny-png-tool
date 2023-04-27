@@ -3,7 +3,7 @@
 const program = require('commander')
 const config = require(`${__dirname}/../package.json`)
 
-program.name('tiny-png-tool').usage('<command>').version(config.version).description('welcome tiny-png-tool')
+program.name('tiny').usage('<command>').version(config.version).description('welcome tiny-png-tool')
 
 program
     .command('start')

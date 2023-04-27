@@ -7,7 +7,7 @@
     "publish:patch": "npm version patch && npm publish --access=public"
   },
   "bin": {
-    "tiny-go": "bin/index",
+    "tiny": "bin/index",
     "tiny-start": "commands/start"
   },
   "author": "owen lee",
