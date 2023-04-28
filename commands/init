@@ -11,7 +11,7 @@ const question = [
   {
     name: 'dirname',
     type: 'input',
-    message: 'input relative dirname',
+    message: 'input relative dirname,default value cwd',
     validate(val) {
       return true
     },
@@ -29,7 +29,7 @@ const question = [
   {
     name: 'limitSize',
     type: 'input',
-    message: 'input limit size of file(kb)',
+    message: 'input limit size of file(kb), default value 50',
     validate(val) {
       return true
     },
