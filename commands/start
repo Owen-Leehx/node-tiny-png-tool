@@ -25,7 +25,7 @@ const question = [
     message: "请输入apiKey",
     validate(val) {
       const apiKey = val || localData.apiKey;
-      if (!apiKey) return "apiKey is required!";
+      if (!apiKey) return "apiKey is required! get it now!!! (https://tinypng.com/developers)";
       return true;
     },
   },
@@ -71,13 +71,13 @@ const startWorking = (targetDirectory, worker, option) => {
             const source = worker.fromFile(dirPath);
             await source.toFile(dirPath);
             const newFileStat = fs.statSync(dirPath);
-            console.log(chalk.blueBright(" \n ---gooooooooooooooood--joooooooooooooooooob !!!  \n"));
+            console.log(chalk.magenta(" \n ---gooooooooooooooood--joooooooooooooooooob !!!  \n"));
             console.log(chalk.green("The directory path is: " + dirPath + "\n"));
             console.log(chalk.yellow(`The ${file} origin size is ${fileStat.size}\n`));
             console.log(
               chalk.blue(
                 chalk.green(symbols.success),
-                `The ${file} originSize=${fileStat.size} -> currentSize=${newFileStat.size}, rate:${
+                `The ${file} originSize=${fileStat.size} -> currentSize=${newFileStat.size},Compression ratio:${
                   Math.round((newFileStat.size / (fileStat.size || 1)) * 10000) / 100
                 }%  \n`
               )

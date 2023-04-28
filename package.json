@@ -8,6 +8,7 @@
   },
   "bin": {
     "tiny": "bin/index",
+    "tiny-go": "commands/go",
     "tiny-start": "commands/start"
   },
   "author": "owen lee",
