@@ -2,53 +2,50 @@
 
 const inquirer = require('inquirer')
 const fs = require('fs')
-const localData = require(`${__dirname}/../localData.json`);
+const localData = require(`${__dirname}/../localData.json`)
 const symbols = require('log-symbols')
 const chalk = require('chalk')
 chalk.level = 1
 
 const question = [
-    {
-        name: "dirname",
-        type: "input",
-        message: "请输入指定文件夹相对路径",
-        validate(val) {
-            return true;
-        },
+  {
+    name: 'dirname',
+    type: 'input',
+    message: 'input relative dirname,default value cwd',
+    validate(val) {
+      return true
     },
-    {
-        name: "apiKey",
-        type: "input",
-        message: "请输入apiKey",
-        validate(val) {
-            if (!val) return "apiKey is required! get it now!!! (https://tinypng.com/developers)";
-            return true;
-        },
+  },
+  {
+    name: 'apiKey',
+    type: 'input',
+    message: 'input apiKey',
+    validate(val) {
+      if (!val) return 'apiKey is required! get it now!!! (https://tinypng.com/developers)'
+      return true
     },
+  },
 
-    {
-        name: "limitSize",
-        type: "input",
-        message: "请输入需要限制的文件大小(kb)",
-        validate(val) {
-            return true;
-        },
+  {
+    name: 'limitSize',
+    type: 'input',
+    message: 'input limit size of file(kb), default value 50',
+    validate(val) {
+      return true
     },
-];
+  },
+]
 inquirer.prompt(question).then((answers) => {
+  let { apiKey, dirname, limitSize } = answers //value is "",not undefined
+  apiKey = apiKey || localData.apiKey
+  limitSize = parseInt(limitSize || 50)
 
-    let { apiKey, dirname, limitSize } = answers; //空值是"",不是undefined
-    apiKey = apiKey || localData.apiKey;
-    dirname = dirname || "/";
-    limitSize = parseInt(limitSize || 50);
+  const mergeData = { ...localData, apiKey, dirname, limitSize }
 
-    const mergeData = { ...localData, apiKey, dirname, limitSize };
-
-    fs.writeFile(`${__dirname}/../localData.json`, JSON.stringify(mergeData), 'utf-8', (err) => {
-        if (err) {
-            return console.log(chalk.red(symbols.error), chalk.red(err))
-        }
-        console.log(chalk.green(symbols.success), chalk.green('init successfully!\n'))
-
-    })
+  fs.writeFile(`${__dirname}/../localData.json`, JSON.stringify(mergeData), 'utf-8', (err) => {
+    if (err) {
+      return console.log(chalk.red(symbols.error), chalk.red(err))
+    }
+    console.log(chalk.green(symbols.success), chalk.green('init successfully!\n'))
+  })
 })
