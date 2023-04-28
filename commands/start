@@ -1,125 +1,122 @@
 #!/usr/bin/env node
 
-const inquirer = require("inquirer");
-const path = require("path");
-const fs = require("fs-extra");
-const tinify = require("tinify");
-const symbols = require("log-symbols");
-const chalk = require("chalk");
-chalk.level = 1;
+const inquirer = require('inquirer')
+const path = require('path')
+const fs = require('fs-extra')
+const tinify = require('tinify')
+const symbols = require('log-symbols')
+const chalk = require('chalk')
+chalk.level = 1
 
-const localData = require(`${__dirname}/../localData.json`);
+const localData = require(`${__dirname}/../localData.json`)
 
 const question = [
   {
-    name: "dirname",
-    type: "input",
-    message: "请输入指定文件夹相对路径",
+    name: 'dirname',
+    type: 'input',
+    message: 'input relative dirname',
     validate(val) {
-      return true;
+      return true
     },
   },
   {
-    name: "apiKey",
-    type: "input",
-    message: "请输入apiKey",
+    name: 'apiKey',
+    type: 'input',
+    message: 'input apiKey',
     validate(val) {
-      const apiKey = val || localData.apiKey;
-      if (!apiKey) return "apiKey is required! get it now!!! (https://tinypng.com/developers)";
-      return true;
+      const apiKey = val || localData.apiKey
+      if (!apiKey) return 'apiKey is required! get it now!!! (https://tinypng.com/developers)'
+      return true
     },
   },
 
   {
-    name: "limitSize",
-    type: "input",
-    message: "请输入需要限制的文件大小",
+    name: 'limitSize',
+    type: 'input',
+    message: 'input limit size of file(kb)',
     validate(val) {
-      return true;
+      return true
     },
   },
-];
-const isImage = (file) => /\.(png|jpg|jpeg)$/i.test(file);
+]
+const isImage = (file) => /\.(png|jpg|jpeg)$/i.test(file)
 
 const storeLocalData = (data) => {
   try {
-    if (!data.apiKey) return;
-    const mergeData = { ...localData, ...data };
-    fs.writeFile(`${__dirname}/../localData.json`, JSON.stringify(mergeData), "utf-8", (err) => {
+    if (!data.apiKey) return
+    const mergeData = { ...localData, ...data }
+    fs.writeFile(`${__dirname}/../localData.json`, JSON.stringify(mergeData), 'utf-8', (err) => {
       if (err) {
-        return console.log(chalk.red(symbols.error), chalk.red(err));
+        return console.log(chalk.red(symbols.error), chalk.red(err))
       }
-      console.log(chalk.green(symbols.success), chalk.green("\n Add a key successfully!\n"));
-    });
+      console.log(chalk.green(symbols.success), chalk.green('\n Add a key successfully!\n'))
+    })
   } catch (error) {}
-};
+}
 
 const startWorking = (targetDirectory, worker, option) => {
-  const { limitSize } = option;
+  const { limitSize } = option
   const work = (dir) => {
     try {
-      const files = fs.readdirSync(dir);
+      const files = fs.readdirSync(dir)
       files.forEach(async (file) => {
-        const dirPath = `${dir}/${file}`;
-        const fileStat = fs.statSync(dirPath);
+        const dirPath = `${dir}/${file}`
+        const fileStat = fs.statSync(dirPath)
         if (fileStat.isDirectory()) {
-          work(dirPath);
+          work(dirPath)
         } else {
           try {
-            if (fileStat.size < 1024 * (limitSize || 50) || !isImage(file)) return;
+            if (fileStat.size < 1024 * limitSize || !isImage(file)) return
 
-            const source = worker.fromFile(dirPath);
-            await source.toFile(dirPath);
-            const newFileStat = fs.statSync(dirPath);
-            console.log(chalk.magenta(" \n ---gooooooooooooooood--joooooooooooooooooob !!!  \n"));
-            console.log(chalk.green("The directory path is: " + dirPath + "\n"));
-            console.log(chalk.yellow(`The ${file} origin size is ${fileStat.size}\n`));
+            const source = worker.fromFile(dirPath)
+            await source.toFile(dirPath)
+            const newFileStat = fs.statSync(dirPath)
+            console.log(chalk.magenta(' \n ---gooooooooooooooood--joooooooooooooooooob !!!  \n'))
+            console.log(chalk.green('The directory path is: ' + dirPath + '\n'))
+            console.log(chalk.yellow(`The ${file} origin size is ${fileStat.size}\n`))
             console.log(
               chalk.blue(
                 chalk.green(symbols.success),
-                `The ${file} originSize=${fileStat.size} -> currentSize=${newFileStat.size},Compression ratio:${
-                  Math.round((newFileStat.size / (fileStat.size || 1)) * 10000) / 100
-                }%  \n`
+                `The ${file} originSize=${fileStat.size} -> currentSize=${newFileStat.size},Compression ratio:${Math.round((newFileStat.size / (fileStat.size || 1)) * 10000) / 100}%  \n`
               )
-            );
+            )
           } catch (error) {
-            console.log(chalk.red(`tiny error, 【${file}】 \n`));
+            console.log(chalk.red(`tiny error, 【${file}】 \n`))
           }
         }
-      });
+      })
     } catch (error) {
-      const errMsg = JSON.stringify(error);
-      console.log(chalk.red(`\n ${errMsg} \n`));
+      const errMsg = JSON.stringify(error)
+      console.log(chalk.red(`\n ${errMsg} \n`))
     }
-  };
+  }
 
-  work(targetDirectory);
-};
+  work(targetDirectory)
+}
 
 function main() {
   inquirer.prompt(question).then((answers) => {
-    let { apiKey, dirname, limitSize } = answers; //空值是"",不是undefined
-    apiKey = apiKey || localData.apiKey;
-    dirname = dirname || "/";
-    limitSize = limitSize || 50;
+    let { apiKey, dirname, limitSize } = answers //value is"",not undefined
+    apiKey = apiKey || localData.apiKey
+    limitSize = parseInt(limitSize || 50)
 
-    const cwd = process.cwd();
-    const targetPath = path.join(cwd, dirname);
-    const isExit = fs.existsSync(targetPath);
+    const cwd = process.cwd()
+    const targetPath = path.join(cwd, dirname)
+    const isExit = fs.existsSync(targetPath)
 
-    storeLocalData(answers);
+    storeLocalData(answers)
 
     if (!isExit) {
-      console.log(chalk.red("\n Target directory does not exit!,Please check! \n "));
-      return;
+      console.log(chalk.red('\n Target directory does not exit!,Please check! \n '))
+      return
     }
 
-    console.log(chalk.green("The targetPath is: " + targetPath + "\n"));
-    console.log(chalk.green("The apiKey is: " + apiKey + "\n"));
-    console.log(chalk.green("The file limit size is: " + limitSize + "\n"));
+    console.log(chalk.green('The targetPath is: ' + targetPath + '\n'))
+    console.log(chalk.green('The apiKey is: ' + apiKey + '\n'))
+    console.log(chalk.green('The file limit size is: ' + limitSize + '\n'))
 
-    tinify.key = apiKey;
-    startWorking(targetPath, tinify, { limitSize });
-  });
+    tinify.key = apiKey
+    startWorking(targetPath, tinify, { limitSize })
+  })
 }
-main();
+main()

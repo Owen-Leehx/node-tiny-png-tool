@@ -1,81 +1,76 @@
 #!/usr/bin/env node
 
-const path = require("path");
-const fs = require("fs-extra");
-const tinify = require("tinify");
-const symbols = require("log-symbols");
-const chalk = require("chalk");
-chalk.level = 1;
+const path = require('path')
+const fs = require('fs-extra')
+const tinify = require('tinify')
+const symbols = require('log-symbols')
+const chalk = require('chalk')
+chalk.level = 1
 
-const localData = require(`${__dirname}/../localData.json`);
+const localData = require(`${__dirname}/../localData.json`)
 
-
-const isImage = (file) => /\.(png|jpg|jpeg)$/i.test(file);
-
+const isImage = (file) => /\.(png|jpg|jpeg)$/i.test(file)
 
 const startWorking = (targetDirectory, worker, option) => {
-    const { limitSize } = option;
-    const work = (dir) => {
-        try {
-            const files = fs.readdirSync(dir);
-            files.forEach(async (file) => {
-                const dirPath = `${dir}/${file}`;
-                const fileStat = fs.statSync(dirPath);
-                if (fileStat.isDirectory()) {
-                    work(dirPath);
-                } else {
-                    try {
-                        if (fileStat.size < 1024 * (limitSize || 50) || !isImage(file)) return;
+  const { limitSize } = option
+  const work = (dir) => {
+    try {
+      const files = fs.readdirSync(dir)
+      files.forEach(async (file) => {
+        const dirPath = `${dir}/${file}`
+        const fileStat = fs.statSync(dirPath)
+        if (fileStat.isDirectory()) {
+          work(dirPath)
+        } else {
+          try {
+            if (fileStat.size < 1024 * limitSize || !isImage(file)) return
 
-                        const source = worker.fromFile(dirPath);
-                        await source.toFile(dirPath);
-                        const newFileStat = fs.statSync(dirPath);
-                        console.log(chalk.magenta(" \n ---gooooooooooooooood--joooooooooooooooooob !!!  \n"));
-                        console.log(chalk.green("The directory path is: " + dirPath + "\n"));
-                        console.log(chalk.yellow(`The ${file} origin size is ${fileStat.size}\n`));
-                        console.log(
-                            chalk.blue(
-                                chalk.green(symbols.success),
-                                `The ${file} originSize=${fileStat.size} -> currentSize=${newFileStat.size},Compression ratio:${Math.round((newFileStat.size / (fileStat.size || 1)) * 10000) / 100
-                                }%  \n`
-                            )
-                        );
-                    } catch (error) {
-                        console.log(chalk.red(`tiny error, 【${file}】 \n`));
-                    }
-                }
-            });
-        } catch (error) {
-            const errMsg = JSON.stringify(error);
-            console.log(chalk.red(`\n ${errMsg} \n`));
+            const source = worker.fromFile(dirPath)
+            await source.toFile(dirPath)
+            const newFileStat = fs.statSync(dirPath)
+            console.log(chalk.magenta(' \n ---gooooooooooooooood--joooooooooooooooooob !!!  \n'))
+            console.log(chalk.green('The directory path is: ' + dirPath + '\n'))
+            console.log(chalk.yellow(`The ${file} origin size is ${fileStat.size}\n`))
+            console.log(
+              chalk.blue(
+                chalk.green(symbols.success),
+                `The ${file} originSize=${fileStat.size} -> currentSize=${newFileStat.size},Compression ratio:${Math.round((newFileStat.size / (fileStat.size || 1)) * 10000) / 100}%  \n`
+              )
+            )
+          } catch (error) {
+            console.log(chalk.red(`tiny error, 【${file}】 \n`))
+          }
         }
-    };
-    console.log(chalk.magenta(" \n running !!! tiny png  \n"));
-    work(targetDirectory);
-};
+      })
+    } catch (error) {
+      const errMsg = JSON.stringify(error)
+      console.log(chalk.red(`\n ${errMsg} \n`))
+    }
+  }
+  console.log(chalk.magenta(' \n running !!! tiny png  \n'))
+  work(targetDirectory)
+}
 
 function main() {
-    const { apiKey, dirname = "/", limitSize = 50 } = localData;
-    if (!apiKey) {
-        return console.log(chalk.red(`\n  apiKey is required! Please init before \n`));
-    }
+  const { apiKey, dirname = '/', limitSize = 50 } = localData
+  if (!apiKey) {
+    return console.log(chalk.red(`\n  apiKey is required! Please init before \n`))
+  }
 
+  const cwd = process.cwd()
+  const targetPath = path.join(cwd, dirname)
+  const isExit = fs.existsSync(targetPath)
 
-    const cwd = process.cwd();
-    const targetPath = path.join(cwd, dirname);
-    const isExit = fs.existsSync(targetPath);
+  if (!isExit) {
+    console.log(chalk.red('\n Target directory does not exit!,Please check! \n '))
+    return
+  }
 
-    if (!isExit) {
-        console.log(chalk.red("\n Target directory does not exit!,Please check! \n "));
-        return;
-    }
+  console.log(chalk.green('The targetPath is: ' + targetPath + '\n'))
+  console.log(chalk.green('The apiKey is: ' + apiKey + '\n'))
+  console.log(chalk.green('The file limit size is: ' + limitSize + '\n'))
 
-    console.log(chalk.green("The targetPath is: " + targetPath + "\n"));
-    console.log(chalk.green("The apiKey is: " + apiKey + "\n"));
-    console.log(chalk.green("The file limit size is: " + limitSize + "\n"));
-
-    tinify.key = apiKey;
-    startWorking(targetPath, tinify, { limitSize });
-
+  tinify.key = apiKey
+  startWorking(targetPath, tinify, { limitSize })
 }
-main();
+main()
