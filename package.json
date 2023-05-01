@@ -12,6 +12,14 @@
     "tiny-start": "commands/start"
   },
   "author": "owen lee",
+  "homepage": "https://github.com/Owen-Leehx/node-tiny-png-tool",
+  "bugs": {
+    "url": "https://github.com/Owen-Leehx/node-tiny-png-tool/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Owen-Leehx/node-tiny-png-tool"
+  },
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.1.2",
